@@ -1,5 +1,4 @@
-// const input = require('prompt-sync')() // for node
-const input = require('sync-input') //for jetbrains
+const input = require('sync-input')
 
 let coffeeMachine = {
     water: 400,
@@ -33,14 +32,6 @@ const cappuccino = {
     money: 6
 }
 
-console.log(`Starting to make a coffee
-Grinding coffee beans
-Boiling water
-Mixing boiled water with crushed coffee beans
-Pouring coffee into the cup
-Pouring some milk into the cup
-Coffee is ready!`)
-
 while (true) {
     console.log(`
 Write action (buy, fill, take, remaining, exit):`)
@@ -49,73 +40,108 @@ Write action (buy, fill, take, remaining, exit):`)
 
     if (action === 'buy') {
         console.log(`
-What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:`)
+What do you want to buy?
+1 - espresso
+2 - latte
+3 - cappuccino
+press any key - back to main menu:`)
 
         const buy = input()
 
-        if (buy !== 'back') {
+        const totalWater = coffeeMachine.water / latte.water
+        const totalMilk = coffeeMachine.milk / latte.milk
+        const totalBeans = coffeeMachine.beans / latte.beans
+        const totalCups = coffeeMachine.cups / latte.cups
 
-            const totalWater = coffeeMachine.water / latte.water
-            const totalMilk = coffeeMachine.milk / latte.milk
-            const totalBeans = coffeeMachine.beans / latte.beans
-            const totalCups = coffeeMachine.cups / latte.cups
+        const totalCoffeeMachine = Math.min(
+            Math.floor(totalWater),
+            Math.floor(totalMilk),
+            Math.floor(totalBeans),
+            Math.floor(totalCups)
+        )
 
-            const totalCoffeeMachine = Math.min(
-                Math.floor(totalWater),
-                Math.floor(totalMilk),
-                Math.floor(totalBeans),
-                Math.floor(totalCups)
-            )
+        let inputData
 
-            let inputData
-
-            if (buy === '1') {
-                inputData = espresso
-            }
-            if (buy === '2') {
-                inputData = latte
-            }
-            if (buy === '3') {
-                inputData = cappuccino
-            }
-
-            if (totalCoffeeMachine < 1) {
-
-                function notEnough() {
-                    if (totalWater < 1) {
-                        return 'water'
-                    }
-
-                    if (totalMilk < 1) {
-                        return 'milk'
-                    }
-
-                    if (totalBeans < 1) {
-                        return 'beans'
-                    }
-
-                    if (totalCups < 1) {
-                        return 'cups'
-                    }
-                }
-
-                console.log(`Sorry, not enough ${notEnough(totalWater, totalMilk, totalBeans, totalCups)}!`)
-            } else {
-                console.log('I have enough resources, making you a coffee!')
-
-                const newData = Object.keys(coffeeMachine).reduce((o, k) => {
-                    o[k] = coffeeMachine[k] - inputData[k];
-                    return o
-                }, {})
-
-                coffeeMachine.water = newData.water
-                coffeeMachine.milk = newData.milk
-                coffeeMachine.beans = newData.beans
-                coffeeMachine.cups = newData.cups
-                coffeeMachine.money = coffeeMachine.money + inputData.money
-            }
+        if (buy === '1') {
+            inputData = espresso
+        } else if (buy === '2') {
+            inputData = latte
+        } else if (buy === '3') {
+            inputData = cappuccino
         } else {
             continue
+        }
+
+        if (totalCoffeeMachine < 1) {
+
+            function notEnough() {
+                if (totalWater < 1) {
+                    return 'water'
+                }
+
+                if (totalMilk < 1) {
+                    return 'milk'
+                }
+
+                if (totalBeans < 1) {
+                    return 'beans'
+                }
+
+                if (totalCups < 1) {
+                    return 'cups'
+                }
+            }
+
+            console.log(`Sorry, not enough ${notEnough(totalWater, totalMilk, totalBeans, totalCups)}!`)
+        } else {
+            console.log('\nI have enough resources, making you a coffee!')
+
+            const newData = Object.keys(coffeeMachine).reduce((o, k) => {
+                o[k] = coffeeMachine[k] - inputData[k];
+                return o
+            }, {})
+
+            coffeeMachine.water = newData.water
+            coffeeMachine.milk = newData.milk
+            coffeeMachine.beans = newData.beans
+            coffeeMachine.cups = newData.cups
+            coffeeMachine.money += inputData.money
+
+            if (newData) {
+                console.log('\nStarting to make a coffee')
+
+                const indicator = setInterval(() => {
+                    console.log('..........')
+                }, 1000)
+
+                setTimeout(() => {
+                    console.log('Grinding coffee beans')
+                }, 2500)
+
+                setTimeout(() => {
+                    console.log('Boiling water')
+                }, 4500)
+
+                setTimeout(() => {
+                    console.log('Mixing boiled water with crushed coffee beans')
+                }, 6500)
+
+                setTimeout(() => {
+                    console.log('Pouring coffee into the cup')
+                }, 8500)
+
+                if (inputData.milk !== 0) {
+                    setTimeout(() => {
+                        console.log('Pouring some milk into the cup')
+                    }, 10500)
+                }
+
+                setTimeout(() => {
+                    clearInterval(indicator)
+                    console.log('Coffee is ready!')
+                }, 12500)
+                break
+            }
         }
     }
 
@@ -132,17 +158,17 @@ What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main
         console.log('Write how many disposable coffee cups you want to add:')
         const fillCups = Number(input())
 
-        coffeeMachine.water = coffeeMachine.water + fillWater
-        coffeeMachine.milk = coffeeMachine.milk + fillMilk
-        coffeeMachine.beans = coffeeMachine.beans + fillBeans
-        coffeeMachine.cups = coffeeMachine.cups + fillCups
+        coffeeMachine.water += fillWater
+        coffeeMachine.milk += fillMilk
+        coffeeMachine.beans += fillBeans
+        coffeeMachine.cups += fillCups
     }
 
     if (action === 'take') {
         console.log(`
 I gave you $${coffeeMachine.money}`)
 
-        coffeeMachine.money = coffeeMachine.money - coffeeMachine.money
+        coffeeMachine.money -= coffeeMachine.money
     }
 
     if (action === 'remaining') {
